@@ -16,17 +16,27 @@ except:
     supabase = None
 
 @app.get("/", response_class=HTMLResponse)
-async def pagina_explorar(request: Request):
+async def pagina_explorar(request: Request, filtro_cidade: str = "", filtro_faculdade: str = ""):
     republicas_formatadas = []
+    cidades_unicas = []
+    faculdades_unicas = []
+    
     if supabase:
+        # Puxa todas as repúblicas publicadas
         resposta = supabase.table('republicas').select('*, faculdades(sigla), fotos(url)').eq('status', 'publicada').execute()
-        for rep in resposta.data:
+        dados = resposta.data
+        
+        # Filtra via Python para evitar erros de SQL complexos
+        if filtro_cidade:
+            dados = [r for r in dados if r.get('cidade') == filtro_cidade]
+        if filtro_faculdade:
+            dados = [r for r in dados if r.get('faculdades', {}).get('sigla') == filtro_faculdade]
+            
+        for rep in dados:
             fotos_urls = [foto['url'] for foto in rep.get('fotos', [])]
             if not fotos_urls:
                 fotos_urls = ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3"]
                 
-            faculdade_sigla = rep.get('faculdades', {}).get('sigla', 'N/A') if rep.get('faculdades') else 'N/A'
-            
             republicas_formatadas.append({
                 "id": rep["id"],
                 "nome": rep["nome"],
@@ -36,13 +46,24 @@ async def pagina_explorar(request: Request):
                 "whatsapp": rep["whatsapp"],
                 "bairro": rep["bairro"],
                 "cidade": rep["cidade"],
-                "faculdade": faculdade_sigla,
+                "faculdade": rep.get('faculdades', {}).get('sigla', 'N/A') if rep.get('faculdades') else 'N/A',
                 "valor_medio": rep["valor_medio_aluguel"],
             })
             
-    return templates.TemplateResponse(request=request, name="explorar.html", context={"request": request, "republicas": republicas_formatadas})
+        # Extrai listas únicas para popular os menus (Dropdowns) do HTML
+        todas_reps = resposta.data
+        cidades_unicas = sorted(list(set(r.get('cidade') for r in todas_reps if r.get('cidade'))))
+        faculdades_unicas = sorted(list(set(r.get('faculdades', {}).get('sigla') for r in todas_reps if r.get('faculdades'))))
+            
+    return templates.TemplateResponse(request=request, name="explorar.html", context={
+        "request": request, 
+        "republicas": republicas_formatadas,
+        "cidades": cidades_unicas,
+        "faculdades": faculdades_unicas,
+        "filtro_cidade": filtro_cidade,
+        "filtro_faculdade": filtro_faculdade
+    })
 
-# NOVA ROTA: O One-Pager da República
 @app.get("/republica/{rep_id}", response_class=HTMLResponse)
 async def pagina_republica(request: Request, rep_id: str):
     if supabase:
@@ -52,9 +73,6 @@ async def pagina_republica(request: Request, rep_id: str):
             fotos_urls = [foto['url'] for foto in rep.get('fotos', [])]
             if not fotos_urls:
                 fotos_urls = ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3"]
-            
-            faculdade_sigla = rep.get('faculdades', {}).get('sigla', 'N/A') if rep.get('faculdades') else 'N/A'
-            faculdade_nome = rep.get('faculdades', {}).get('nome', 'N/A') if rep.get('faculdades') else 'N/A'
             
             rep_formatada = {
                 "id": rep["id"],
@@ -66,8 +84,8 @@ async def pagina_republica(request: Request, rep_id: str):
                 "bairro": rep["bairro"],
                 "cidade": rep["cidade"],
                 "endereco": rep["endereco"],
-                "faculdade_sigla": faculdade_sigla,
-                "faculdade_nome": faculdade_nome,
+                "faculdade_sigla": rep.get('faculdades', {}).get('sigla', 'N/A') if rep.get('faculdades') else 'N/A',
+                "faculdade_nome": rep.get('faculdades', {}).get('nome', 'N/A') if rep.get('faculdades') else 'N/A',
                 "valor_medio": rep["valor_medio_aluguel"],
                 "descricao": rep.get("descricao", "Sem descrição disponível.")
             }
