@@ -1,54 +1,55 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ rep.nome }} - BuscaRep</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100">
-    <div class="max-w-md mx-auto bg-white min-h-screen shadow-sm relative">
-        <!-- Foto de Cabeçalho e Botão Voltar -->
-        <div class="relative h-64">
-            <img src="{{ rep.foto_capa }}" class="w-full h-full object-cover">
-            <a href="/" class="absolute top-4 left-4 bg-white/90 p-2 px-4 rounded-full shadow-sm text-gray-800 text-sm font-semibold hover:bg-gray-50">
+<body class="bg-gray-50 pb-24">
+    <div class="max-w-xl mx-auto bg-white min-h-screen shadow-sm relative">
+        <!-- Cabeçalho com Foto e Botão Voltar -->
+        <div class="relative h-72">
+            <img src="{{ rep.fotos[0] }}" class="w-full h-full object-cover">
+            <a href="/" class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm p-2 px-4 rounded-full shadow-sm text-gray-800 text-sm font-bold hover:bg-gray-100 transition">
                 ← Voltar
             </a>
         </div>
         
-        <!-- Detalhes -->
-        <div class="p-6 pb-28">
+        <!-- Detalhes do One-Pager -->
+        <div class="p-6">
             <div class="flex justify-between items-start mb-2">
-                <h1 class="text-2xl font-bold text-gray-800">{{ rep.nome }}</h1>
+                <h1 class="text-3xl font-extrabold text-gray-900">{{ rep.nome }}</h1>
                 {% if rep.vagas > 0 %}
-                    <span class="bg-green-100 text-green-700 text-sm px-3 py-1 rounded-full whitespace-nowrap">{{ rep.vagas }} vagas</span>
+                    <span class="bg-green-100 text-green-700 text-sm font-bold px-3 py-1 rounded-full whitespace-nowrap">{{ rep.vagas }} vagas</span>
                 {% else %}
-                    <span class="bg-red-100 text-red-700 text-sm px-3 py-1 rounded-full whitespace-nowrap">Lotada</span>
+                    <span class="bg-red-100 text-red-700 text-sm font-bold px-3 py-1 rounded-full whitespace-nowrap">Lotada</span>
                 {% endif %}
             </div>
-            <p class="text-gray-500 mb-6">📍 {{ rep.cidade }} - Bairro {{ rep.bairro }}</p>
             
-            <h3 class="font-semibold text-lg text-gray-800 mb-2">Sobre a república</h3>
-            <p class="text-gray-600 text-sm mb-6">{{ rep.descricao }}</p>
+            <p class="text-gray-500 mb-2">📍 {{ rep.endereco }}, {{ rep.bairro }} - {{ rep.cidade }}</p>
+            <p class="text-indigo-600 font-bold mb-6">🎓 {{ rep.faculdade_nome }} ({{ rep.faculdade_sigla }})</p>
             
-            <h3 class="font-semibold text-lg text-gray-800 mb-2">O Quarto</h3>
-            <p class="text-gray-600 text-sm mb-6">{{ rep.quarto }}</p>
+            <h3 class="font-bold text-lg text-gray-800 mb-2">Sobre a república</h3>
+            <p class="text-gray-600 mb-6 leading-relaxed">{{ rep.descricao }}</p>
             
-            <h3 class="font-semibold text-lg text-gray-800 mb-3">Comodidades</h3>
+            <h3 class="font-bold text-lg text-gray-800 mb-3">Comodidades</h3>
             <div class="flex flex-wrap gap-2 mb-8">
-                {% for com in rep.comodidades %}
-                <span class="bg-indigo-50 text-indigo-700 text-sm px-3 py-1 rounded-lg border border-indigo-100">{{ com }}</span>
+                {% for facilidade in rep.facilidades %}
+                <span class="bg-gray-100 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-lg border border-gray-200">{{ facilidade }}</span>
                 {% endfor %}
             </div>
         </div>
         
-        <!-- Barra Fixa em Baixo (Contacto) -->
-        <div class="fixed bottom-0 w-full max-w-md bg-white border-t p-4 flex justify-between items-center pb-8 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+        <!-- Barra Fixa de Contacto em Baixo -->
+        <div class="fixed bottom-0 w-full max-w-xl bg-white border-t border-gray-200 p-4 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
             <div>
-                <p class="text-sm text-gray-500">A partir de</p>
-                <p class="text-xl font-bold text-indigo-600">R$ {{ rep.preco_minimo }}<span class="text-sm font-normal text-gray-500">/mês</span></p>
+                <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">A partir de</p>
+                <p class="text-2xl font-black text-indigo-700">R$ {{ rep.valor_medio }}<span class="text-sm font-normal text-gray-500">/mês</span></p>
             </div>
-            <a href="#" onclick="alert('Isto vai abrir o WhatsApp da república com uma mensagem pronta!')" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl shadow-md transition">
+            <a href="https://wa.me/{{ rep.whatsapp }}?text=Oi!%20Vi%20a%20{{ rep.nome }}%20no%20BuscaRep.%20Ainda%20tem%20vaga?" 
+               target="_blank"
+               class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl shadow-md transition">
                 Chamar no WhatsApp
             </a>
         </div>
