@@ -17,42 +17,37 @@ except:
 
 @app.get("/", response_class=HTMLResponse)
 async def pagina_explorar(request: Request):
+    republicas_formatadas = []
     
-    republicas_mock = [
-        {
-            "id": 1,
-            "nome": "República Teste 1",
-            "descricao": "Ambiente tranquilo, ideal para quem quer focar nos estudos.",
-            "fotos": [
-                "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-            ],
-            "vagas": 2,
-            "facilidades": ["Wi-Fi", "Mobiliado", "Lavanderia"],
-            "whatsapp": "5512982588993", # SEU WHATSAPP AQUI
-            "bairro": "BPS",
-            "cidade": "Itajubá",
-            "faculdade": "UNIFEI",
-            "valor_medio": 650
-        },
-        {
-            "id": 2,
-            "nome": "República Teste 2",
-            "descricao": "Casa grande, galera animada e bem perto do portão principal.",
-            "fotos": [
-                "https://images.unsplash.com/photo-1502672260266-1c1de2d9d0cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-            ],
-            "vagas": 0,
-            "facilidades": ["Garagem", "Cozinha equipada", "Quintal"],
-            "whatsapp": "5512982588993", # SEU WHATSAPP AQUI TAMBÉM
-            "bairro": "Centro",
-            "cidade": "Lavras",
-            "faculdade": "UFLA",
-            "valor_medio": 800
-        }
-    ]
-    
+    if supabase:
+        # Puxa apenas repúblicas publicadas e traz as tabelas relacionadas (faculdades e fotos)
+        resposta = supabase.table('republicas').select('*, faculdades(sigla), fotos(url)').eq('status', 'publicada').execute()
+        
+        for rep in resposta.data:
+            # Organiza as fotos numa lista simples
+            fotos_urls = [foto['url'] for foto in rep.get('fotos', [])]
+            if not fotos_urls:
+                fotos_urls = ["https://via.placeholder.com/800x400?text=Sem+Foto"]
+                
+            # Extrai a sigla da faculdade com segurança
+            faculdade_sigla = rep.get('faculdades', {}).get('sigla', 'N/A') if rep.get('faculdades') else 'N/A'
+            
+            republicas_formatadas.append({
+                "id": rep["id"],
+                "nome": rep["nome"],
+                "fotos": fotos_urls,
+                "vagas": rep["vagas_disponiveis"],
+                "facilidades": rep.get("facilidades", []),
+                "whatsapp": rep["whatsapp"],
+                "bairro": rep["bairro"],
+                "cidade": rep["cidade"],
+                "faculdade": faculdade_sigla,
+                "valor_medio": rep["valor_medio_aluguel"],
+                "descricao": "" # O novo plano técnico não inclui descrição, deixamos vazio para não quebrar o HTML
+            })
+            
     return templates.TemplateResponse(
         request=request, 
         name="explorar.html", 
-        context={"request": request, "republicas": republicas_mock}
+        context={"request": request, "republicas": republicas_formatadas}
     )
