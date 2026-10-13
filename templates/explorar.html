@@ -16,8 +16,10 @@
         <div class="space-y-6">
             {% for rep in republicas %}
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="relative h-56">
-                    <img src="{{ rep.fotos[0] }}" alt="Foto de {{ rep.nome }}" class="w-full h-full object-cover">
+                
+                <!-- IMAGEM AGORA É CLICÁVEL -->
+                <a href="/republica/{{ rep.id }}" class="relative h-56 block group cursor-pointer">
+                    <img src="{{ rep.fotos[0] }}" alt="Foto de {{ rep.nome }}" class="w-full h-full object-cover group-hover:opacity-90 transition">
                     <div class="absolute top-3 right-3">
                         {% if rep.vagas > 0 %}
                             <span class="bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
@@ -32,7 +34,7 @@
                     <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg shadow-sm">
                         <span class="text-xs font-bold text-gray-700">🎓 {{ rep.faculdade }}</span>
                     </div>
-                </div>
+                </a>
                 
                 <div class="p-5">
                     <div class="flex justify-between items-start mb-2">
@@ -40,8 +42,7 @@
                         <span class="text-lg font-black text-indigo-600">R$ {{ rep.valor_medio }}<span class="text-xs text-gray-500 font-normal">/mês</span></span>
                     </div>
                     
-                    <p class="text-sm text-gray-500 mb-3">📍 {{ rep.bairro }}, {{ rep.cidade }}</p>
-                    <p class="text-sm text-gray-600 mb-4 line-clamp-2">{{ rep.descricao }}</p>
+                    <p class="text-sm text-gray-500 mb-4">📍 {{ rep.bairro }}, {{ rep.cidade }}</p>
                     
                     <div class="flex flex-wrap gap-2 mb-5">
                         {% for facilidade in rep.facilidades %}
