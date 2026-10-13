@@ -6,25 +6,39 @@
     <title>BuscaRep - Explorar</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-6">
+<body class="bg-gray-100 p-6 pb-12">
     <div class="max-w-md mx-auto">
         <h1 class="text-2xl font-bold text-gray-800 mb-6">BuscaRep - Itajubá</h1>
         
-        <div class="space-y-4">
+        <div class="space-y-6">
             {% for rep in republicas %}
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                <h2 class="text-lg font-semibold">{{ rep.nome }}</h2>
-                <p class="text-gray-500 text-sm mb-3">📍 Bairro {{ rep.bairro }}</p>
+            <!-- Cartão Clicável -->
+            <a href="/republica/{{ rep.id }}" class="block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
+                <!-- Foto de capa genérica -->
+                <img src="{{ rep.foto_capa }}" alt="Foto de {{ rep.nome }}" class="w-full h-48 object-cover">
                 
-                <div class="flex justify-between items-center">
-                    <span class="text-indigo-600 font-bold">R$ {{ rep.preco_minimo }}/mês</span>
-                    {% if rep.vagas > 0 %}
-                        <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">{{ rep.vagas }} vagas</span>
-                    {% else %}
-                        <span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full">Sem vagas</span>
-                    {% endif %}
+                <div class="p-4">
+                    <h2 class="text-lg font-semibold text-gray-800">{{ rep.nome }}</h2>
+                    <p class="text-gray-500 text-sm mb-3">📍 {{ rep.cidade }} - Bairro {{ rep.bairro }}</p>
+                    
+                    <!-- Comodidades (mostra apenas as primeiras duas) -->
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        {% for com in rep.comodidades[:2] %}
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">{{ com }}</span>
+                        {% endfor %}
+                        <span class="text-gray-400 text-xs py-1">+ info</span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center border-t pt-3">
+                        <span class="text-indigo-600 font-bold">R$ {{ rep.preco_minimo }}/mês</span>
+                        {% if rep.vagas > 0 %}
+                            <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">{{ rep.vagas }} vagas</span>
+                        {% else %}
+                            <span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full">Sem vagas</span>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
+            </a>
             {% endfor %}
         </div>
     </div>
