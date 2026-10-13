@@ -1,45 +1,75 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BuscaRep - Explorar</title>
+    <title>BuscaRep - Repúblicas Universitárias</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-6 pb-12">
-    <div class="max-w-md mx-auto">
-        <h1 class="text-2xl font-bold text-gray-800 mb-6">BuscaRep - Itajubá</h1>
+<body class="bg-gray-50 p-4 md:p-8 pb-20">
+    <div class="max-w-xl mx-auto">
         
+        <!-- Cabeçalho Simples -->
+        <header class="mb-6">
+            <h1 class="text-3xl font-extrabold text-indigo-700">BuscaRep</h1>
+            <p class="text-gray-500 text-sm">Encontre a sua república ideal.</p>
+        </header>
+        
+        <!-- Lista de Repúblicas -->
         <div class="space-y-6">
+            <!-- 👉 ATENÇÃO AQUI 3: O 'for' repete este cartão para cada república no banco -->
             {% for rep in republicas %}
-            <!-- Cartão Clicável -->
-            <a href="/republica/{{ rep.id }}" class="block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
-                <!-- Foto de capa genérica -->
-                <img src="{{ rep.foto_capa }}" alt="Foto de {{ rep.nome }}" class="w-full h-48 object-cover">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                 
-                <div class="p-4">
-                    <h2 class="text-lg font-semibold text-gray-800">{{ rep.nome }}</h2>
-                    <p class="text-gray-500 text-sm mb-3">📍 {{ rep.cidade }} - Bairro {{ rep.bairro }}</p>
-                    
-                    <!-- Comodidades (mostra apenas as primeiras duas) -->
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        {% for com in rep.comodidades[:2] %}
-                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">{{ com }}</span>
-                        {% endfor %}
-                        <span class="text-gray-400 text-xs py-1">+ info</span>
-                    </div>
-                    
-                    <div class="flex justify-between items-center border-t pt-3">
-                        <span class="text-indigo-600 font-bold">R$ {{ rep.preco_minimo }}/mês</span>
+                <!-- Foto e Vagas (Sobrepostas) -->
+                <div class="relative h-56">
+                    <img src="{{ rep.fotos[0] }}" alt="Foto de {{ rep.nome }}" class="w-full h-full object-cover">
+                    <div class="absolute top-3 right-3">
                         {% if rep.vagas > 0 %}
-                            <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">{{ rep.vagas }} vagas</span>
+                            <span class="bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
+                                {{ rep.vagas }} VAGAS
+                            </span>
                         {% else %}
-                            <span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full">Sem vagas</span>
+                            <span class="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
+                                LOTADA
+                            </span>
                         {% endif %}
                     </div>
+                    <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg shadow-sm">
+                        <span class="text-xs font-bold text-gray-700">🎓 {{ rep.faculdade }}</span>
+                    </div>
                 </div>
-            </a>
+                
+                <!-- Informações -->
+                <div class="p-5">
+                    <div class="flex justify-between items-start mb-2">
+                        <h2 class="text-xl font-bold text-gray-900">{{ rep.nome }}</h2>
+                        <span class="text-lg font-black text-indigo-600">R$ {{ rep.valor_medio }}<span class="text-xs text-gray-500 font-normal">/mês</span></span>
+                    </div>
+                    
+                    <p class="text-sm text-gray-500 mb-3">📍 {{ rep.bairro }}, {{ rep.cidade }}</p>
+                    <p class="text-sm text-gray-600 mb-4 line-clamp-2">{{ rep.descricao }}</p>
+                    
+                    <!-- Facilidades -->
+                    <div class="flex flex-wrap gap-2 mb-5">
+                        {% for facilidade in rep.facilidades %}
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-md border border-gray-200">
+                            {{ facilidade }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Botão WhatsApp -->
+                    <!-- 👉 ATENÇÃO AQUI 4: O link monta a mensagem automaticamente -->
+                    <a href="https://wa.me/{{ rep.whatsapp }}?text=Oi!%20Vi%20a%20{{ rep.nome }}%20no%20BuscaRep.%20Ainda%20tem%20vaga?" 
+                       target="_blank"
+                       class="block w-full text-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl transition duration-200 shadow-sm">
+                        Chamar no WhatsApp
+                    </a>
+                </div>
+            </div>
             {% endfor %}
+            
         </div>
     </div>
 </body>
