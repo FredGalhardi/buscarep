@@ -26,4 +26,10 @@ async def pagina_explorar(request: Request):
         {"nome": "República Teste 2", "bairro": "Centro", "preco_minimo": 850, "vagas": 0}
     ]
     
-    return templates.TemplateResponse("explorar.html", {"request": request, "republicas": republicas_teste})
+    # CORREÇÃO: Argumentos passados explicitamente (request, name, context) 
+    # para suportar as versões mais recentes do FastAPI/Jinja2
+    return templates.TemplateResponse(
+        request=request, 
+        name="explorar.html", 
+        context={"request": request, "republicas": republicas_teste}
+    )
