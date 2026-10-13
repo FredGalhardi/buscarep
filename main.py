@@ -7,6 +7,7 @@ import os
 app = FastAPI(title="BuscaRep")
 templates = Jinja2Templates(directory="templates")
 
+# 👉 ATENÇÃO AQUI 1: Quando formos ligar o banco real, estas chaves vão conectar ao Supabase
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
 
@@ -15,53 +16,47 @@ try:
 except:
     supabase = None
 
-# Base de dados fictícia enriquecida
-republicas_teste = [
-    {
-        "id": 1,
-        "nome": "República Teste 1", 
-        "cidade": "Itajubá",
-        "bairro": "BPS", 
-        "preco_minimo": 600, 
-        "vagas": 2,
-        "foto_capa": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        "descricao": "República tradicional, ambiente focado nos estudos durante a semana e descontraído no final de semana. Fica muito perto da Unifei.",
-        "comodidades": ["Internet 500MB", "Faxineira 2x/semana", "Máquina de Lavar", "Garagem"],
-        "quarto": "Quarto duplo partilhado, mobilado com cama, secretária e roupeiro."
-    },
-    {
-        "id": 2,
-        "nome": "República Teste 2", 
-        "cidade": "Itajubá",
-        "bairro": "Centro", 
-        "preco_minimo": 850, 
-        "vagas": 0,
-        "foto_capa": "https://images.unsplash.com/photo-1502672260266-1c1de2d9d0cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        "descricao": "República mista no centro da cidade, perto de supermercados e da paragem de autocarro para a faculdade.",
-        "comodidades": ["Internet 300MB", "TV por Cabo", "Cozinha Completa", "Varanda"],
-        "quarto": "Quarto individual amplo e bem arejado."
-    }
-]
-
 @app.get("/", response_class=HTMLResponse)
 async def pagina_explorar(request: Request):
+    
+    # 👉 ATENÇÃO AQUI 2: No futuro, vamos apagar este bloco e fazer: 
+    # republicas = supabase.table('republicas').select('*').execute()
+    
+    republicas_mock = [
+        {
+            "id": 1,
+            "nome": "República Teste 1",             # 1. Nome
+            "descricao": "Ambiente tranquilo, ideal para quem quer focar nos estudos.", # 2. Descrição pequena
+            "fotos": [                               # 3. Fotos (a primeira é a capa)
+                "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            ],
+            "vagas": 2,                              # 4. Qtde vagas
+            "facilidades": ["Wi-Fi", "Mobiliado", "Lavanderia"], # 5. Facilidades
+            "whatsapp": "5535999999999",             # 6. Contato (número limpo para o link wa.me)
+            "bairro": "BPS",                         # 7. Endereço (bairro público)
+            "cidade": "Itajubá",
+            "faculdade": "UNIFEI",                   # 8. Faculdade
+            "valor_medio": 650                       # 9. Valor médio
+        },
+        {
+            "id": 2,
+            "nome": "República Teste 2",
+            "descricao": "Casa grande, galera animada e bem perto do portão principal.",
+            "fotos": [
+                "https://images.unsplash.com/photo-1502672260266-1c1de2d9d0cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            ],
+            "vagas": 0, # Sem vagas para testarmos o visual
+            "facilidades": ["Garagem", "Cozinha equipada", "Quintal"],
+            "whatsapp": "5535888888888",
+            "bairro": "Centro",
+            "cidade": "Lavras",
+            "faculdade": "UFLA",
+            "valor_medio": 800
+        }
+    ]
+    
     return templates.TemplateResponse(
         request=request, 
         name="explorar.html", 
-        context={"request": request, "republicas": republicas_teste}
-    )
-
-# NOVA ROTA: Quando o utilizador clica numa república
-@app.get("/republica/{rep_id}", response_class=HTMLResponse)
-async def pagina_republica(request: Request, rep_id: int):
-    # Procura a república pelo ID
-    rep_encontrada = next((rep for rep in republicas_teste if rep["id"] == rep_id), None)
-    
-    if not rep_encontrada:
-        return HTMLResponse(content="República não encontrada", status_code=404)
-        
-    return templates.TemplateResponse(
-        request=request, 
-        name="republica.html", 
-        context={"request": request, "rep": rep_encontrada}
+        context={"request": request, "republicas": republicas_mock}
     )
